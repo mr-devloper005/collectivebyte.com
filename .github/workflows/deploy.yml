@@ -65,9 +65,21 @@ jobs:
           set -euo pipefail
           printf '%s' "$APP_ENV_PRODUCTION" > .env.build
           node scripts/validate-env.mjs .env.build
-          set -a
-          . ./.env.build
-          set +a
+          node <<'NODE'
+          const fs = require('fs');
+          const lines = fs.readFileSync('.env.build', 'utf8').split(/\r?\n/);
+          const out = [];
+          for (const raw of lines) {
+            const line = raw.trim();
+            if (!line || line.startsWith('#') || !line.includes('=')) continue;
+            const key = line.slice(0, line.indexOf('=')).trim();
+            let value = line.slice(line.indexOf('=') + 1).trim();
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
+            out.push(`export ${key}=${JSON.stringify(value)}`);
+          }
+          fs.writeFileSync('.build-env.sh', out.join('\n'));
+          NODE
+          . ./.build-env.sh
 
           built_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
