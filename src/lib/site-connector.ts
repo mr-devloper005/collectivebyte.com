@@ -24,16 +24,25 @@ export type SiteBootstrap = {
   blueprint?: Record<string, unknown>;
 };
 
+export type SiteFeedPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+};
+
 export type SiteFeed<TPost = SitePost> = {
   site: SiteBootstrap["site"];
   posts: TPost[];
+  pagination?: SiteFeedPagination;
 };
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_MASTER_PANEL_URL ||
-  process.env.NEXT_PUBLIC_MASTER_API_URL;
+  process.env.NEXT_PUBLIC_MASTER_API_URL ||
+  process.env.NEXT_PUBLIC_MASTER_PANEL_URL;
 const SITE_CODE = process.env.NEXT_PUBLIC_SITE_CODE;
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 const FEED_REVALIDATE_SECONDS = (() => {
   const parsed = Number(process.env.NEXT_PUBLIC_FEED_REVALIDATE_SECONDS ?? 300);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 300;
@@ -66,14 +75,14 @@ const readMemoryFallback = <T>(key: string): T | null => {
   return cached.data as T;
 };
 
-async function fetchPublicJson<T>(path: string, options?: { fresh?: boolean }): Promise<T | null> {
+async function fetchPublicJson<T>(path: string, options?: { fresh?: boolean; timeoutMs?: number }): Promise<T | null> {
   const target = getPublicUrl(path);
   if (!target) return null;
 
   try {
     const signal =
       typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
-        ? AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+        ? AbortSignal.timeout(options?.timeoutMs || REQUEST_TIMEOUT_MS)
         : undefined;
     const response = await fetch(target, {
       method: "GET",
@@ -94,7 +103,7 @@ async function fetchPublicJson<T>(path: string, options?: { fresh?: boolean }): 
     if (data) saveMemoryFallback(target, data);
     return data;
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV !== "production" && !(error instanceof DOMException && error.name === "TimeoutError")) {
       console.warn("Public connector request failed", error);
     }
     return readMemoryFallback<T>(target);
@@ -105,12 +114,39 @@ export async function fetchSiteBootstrap(options?: { fresh?: boolean }): Promise
   return fetchPublicJson<SiteBootstrap>("/bootstrap", options);
 }
 
+
+export async function fetchSitePost<TPost = SitePost>(
+  slug: string,
+  options?: { fresh?: boolean; task?: string; timeoutMs?: number }
+): Promise<(SiteBootstrap & { post: TPost }) | null> {
+  const safeSlug = String(slug || "").trim();
+  if (!safeSlug) return null;
+  const params = new URLSearchParams();
+  if (typeof options?.task === "string" && options.task.trim()) {
+    params.set("task", options.task.trim().toLowerCase());
+  }
+  const query = params.toString();
+  return fetchPublicJson<SiteBootstrap & { post: TPost }>(
+    `/post/${encodeURIComponent(safeSlug)}${query ? `?${query}` : ""}`,
+    options
+  );
+}
+
 export async function fetchSiteFeed<TPost = SitePost>(
   limit = 50,
-  options?: { fresh?: boolean; category?: string; task?: string }
+  options?: { fresh?: boolean; category?: string; task?: string; page?: number; fromDays?: number; toDays?: number; timeoutMs?: number }
 ): Promise<SiteFeed<TPost> | null> {
   const params = new URLSearchParams();
   params.set("limit", String(limit));
+  if (typeof options?.page === "number" && Number.isFinite(options.page) && options.page > 1) {
+    params.set("page", String(Math.floor(options.page)));
+  }
+  if (typeof options?.fromDays === "number" && Number.isFinite(options.fromDays) && options.fromDays > 0) {
+    params.set("fromDays", String(Math.floor(options.fromDays)));
+  }
+  if (typeof options?.toDays === "number" && Number.isFinite(options.toDays) && options.toDays > 0) {
+    params.set("toDays", String(Math.floor(options.toDays)));
+  }
   if (typeof options?.category === "string" && options.category.trim()) {
     params.set("category", options.category.trim().toLowerCase());
   }

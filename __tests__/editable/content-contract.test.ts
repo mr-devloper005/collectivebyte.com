@@ -1,4 +1,5 @@
-import { globalContent, pagesContent, siteContent } from '@/editable/content/siteContent'
+import { globalContent } from '@/editable/content/global.content'
+import { pagesContent } from '@/editable/content/pages.content'
 import { assertContract, isHttpUrl, isNonEmptyString, isNonEmptyText } from '../helpers/contract'
 
 describe('editable content contract', () => {
@@ -72,35 +73,6 @@ describe('editable content contract', () => {
         actual: pagesContent.home.intro.paragraphs,
         hint: 'Keep at least one intro paragraph so page content does not render empty.',
         file: 'src/editable/content/pages.content.ts',
-      },
-    ])
-  })
-
-  it('keeps legacy siteContent aliases intact for page files', () => {
-    assertContract([
-      {
-        name: 'siteContent.home metadata alias changed',
-        pass: siteContent.home.metadata.title === pagesContent.home.metadata.title,
-        expected: 'siteContent.home.metadata.title matches pagesContent.home.metadata.title',
-        actual: siteContent.home.metadata.title,
-        hint: 'Do not break siteContent aliases; existing editable page files depend on them.',
-        file: 'src/editable/content/siteContent.ts',
-      },
-      {
-        name: 'About page title alias is missing',
-        pass: isNonEmptyString(siteContent.about.title),
-        expected: 'siteContent.about.title is a non-empty string',
-        actual: siteContent.about.title,
-        hint: 'Restore about content mapping in siteContent.ts/pages.content.ts.',
-        file: 'src/editable/content/siteContent.ts',
-      },
-      {
-        name: 'Contact form title alias is missing',
-        pass: isNonEmptyString(siteContent.contact.formTitle),
-        expected: 'siteContent.contact.formTitle is a non-empty string',
-        actual: siteContent.contact.formTitle,
-        hint: 'Contact page needs formTitle to render the lead form section clearly.',
-        file: 'src/editable/content/siteContent.ts',
       },
     ])
   })
