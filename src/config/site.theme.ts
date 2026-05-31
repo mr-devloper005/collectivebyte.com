@@ -25,5 +25,8 @@ export const SITE_THEME = defineSiteTheme({
     classified: 'catalog-grid',
     pdf: 'catalog-grid',
     sbm: 'editorial-feature',
+    social: 'studio-panel',
+    org: 'catalog-grid',
+    comment: 'editorial-feature',
   },
 })

@@ -1,8 +1,21 @@
-export { generateMetadata } from '@/editable/pages/BusinessListingPage'
-import { BusinessListingTaskPage } from '@/editable/pages/BusinessListingPage'
+import { TaskListPage } from "@/components/tasks/task-list-page";
+import { buildTaskMetadata } from "@/lib/seo";
+import { taskPageMetadata } from "@/config/site.content";
 
-export default function ListingsPage(props: { searchParams?: Promise<{ category?: string; page?: string }> }) {
-  return <BusinessListingTaskPage {...props} basePath="/listings" />
+export const revalidate = 3;
+
+export const generateMetadata = () =>
+  buildTaskMetadata("listing", {
+    path: "/listings",
+    title: taskPageMetadata.listing.title,
+    description: taskPageMetadata.listing.description,
+  });
+
+export default async function ListingsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ category?: string }>;
+}) {
+  const resolved = (await searchParams) || {};
+  return <TaskListPage task="listing" category={resolved.category} />;
 }
-
-export const revalidate = 3

@@ -304,7 +304,7 @@ export async function buildPageMetadata(options: PageMetadataOptions): Promise<M
 
 export const buildTaskMetadata = async (
   task: TaskKey,
-  options?: Partial<PageMetadataOptions>
+  options?: Omit<PageMetadataOptions, "path">
 ): Promise<Metadata> => {
   const config = getTaskConfig(task);
   const title = config ? `${config.label} | ${SITE_CONFIG.name}` : SITE_CONFIG.seo.title;
@@ -362,7 +362,7 @@ export const buildPostMetadata = async (task: TaskKey, post: SitePost): Promise<
 
   const url = ctx.canonical || canonicalForPath(path);
   const author = post.authorName || SITE_CONFIG.name;
-  const isArticleLike = task === "article";
+  const isArticleLike = task === "article" || task === "comment";
 
   return {
     title,

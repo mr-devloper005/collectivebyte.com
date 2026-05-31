@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/"] ,
+        disallow: ["/dashboard", "/settings", "/create", "/local", "/login", "/register"],
       },
     ],
     host: BASE_URL,

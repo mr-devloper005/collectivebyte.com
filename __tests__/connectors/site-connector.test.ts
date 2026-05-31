@@ -23,7 +23,6 @@ describe('master panel public connector', () => {
     global.fetch = fetchMock
 
     const { fetchSiteBootstrap } = await loadConnector({
-      NEXT_PUBLIC_MASTER_API_URL: undefined,
       NEXT_PUBLIC_MASTER_PANEL_URL: 'https://master.example.com/',
       NEXT_PUBLIC_SITE_CODE: 'demo',
       NEXT_PUBLIC_FEED_REVALIDATE_SECONDS: '123',
@@ -116,7 +115,6 @@ describe('master panel public connector', () => {
     )
 
     const { fetchSiteBootstrap } = await loadConnector({
-      NEXT_PUBLIC_MASTER_API_URL: undefined,
       NEXT_PUBLIC_MASTER_PANEL_URL: 'https://master.example.com',
       NEXT_PUBLIC_SITE_CODE: 'missing-site',
       NODE_ENV: 'test',

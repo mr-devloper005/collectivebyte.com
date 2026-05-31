@@ -1,11 +1,12 @@
 'use client'
 
 import { Building2, FileText, Image as ImageIcon, Mail, MapPin, Phone, Sparkles, Bookmark } from 'lucide-react'
-import { pagesContent } from '@/editable/content/pages.content'
+import { NavbarShell } from '@/components/shared/navbar-shell'
+import { Footer } from '@/components/shared/footer'
+import { siteContent } from '@/editable/content/siteContent'
 import { getFactoryState } from '@/design/factory/get-factory-state'
 import { getProductKind } from '@/design/factory/get-product-kind'
-import { EditableContactLeadForm } from '@/editable/components/EditableContactLeadForm'
-import { EditableSiteShell } from '@/editable/shell/EditableSiteShell'
+import { ContactLeadForm } from "@/components/shared/contact-lead-form";
 
 function getTone(kind: ReturnType<typeof getProductKind>) {
   if (kind === 'directory') {
@@ -75,13 +76,14 @@ export default function ContactPage() {
             ]
 
   return (
-    <EditableSiteShell className={tone.shell}>
+    <div className={`min-h-screen ${tone.shell}`}>
+      <NavbarShell />
       <main className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">{pagesContent.contact.eyebrow}</p>
-            <h1 className="mt-4 text-5xl font-semibold tracking-[-0.05em]">{pagesContent.contact.title}</h1>
-            <p className={`mt-5 max-w-2xl text-sm leading-8 ${tone.muted}`}>{pagesContent.contact.description}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] opacity-70">{siteContent.contact.eyebrow}</p>
+            <h1 className="mt-4 text-5xl font-semibold tracking-[-0.05em]">{siteContent.contact.title}</h1>
+            <p className={`mt-5 max-w-2xl text-sm leading-8 ${tone.muted}`}>{siteContent.contact.description}</p>
             <div className="mt-8 space-y-4">
               {lanes.map((lane) => (
                 <div key={lane.title} className={`rounded-[1.6rem] p-5 ${tone.soft}`}>
@@ -94,11 +96,12 @@ export default function ContactPage() {
           </div>
 
           <div className={`rounded-[2rem] p-7 ${tone.panel}`}>
-            <h2 className="text-2xl font-semibold">{pagesContent.contact.formTitle}</h2>
-            <EditableContactLeadForm />
+            <h2 className="text-2xl font-semibold">{siteContent.contact.formTitle}</h2>
+            <ContactLeadForm />
           </div>
         </section>
       </main>
-    </EditableSiteShell>
+      <Footer />
+    </div>
   )
 }

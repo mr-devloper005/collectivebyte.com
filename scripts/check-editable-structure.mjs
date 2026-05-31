@@ -12,11 +12,6 @@ const files = [
 ].filter(Boolean)
 const unique = [...new Set(files)]
 
-if (process.env.ALLOW_INFRASTRUCTURE_CHANGES === '1') {
-  console.log('Editable structure check bypassed because ALLOW_INFRASTRUCTURE_CHANGES=1 is set. Use this only for base-template infrastructure commits.')
-  process.exit(0)
-}
-
 const violations = unique.filter((file) => {
   if (file === 'src/editable/theme/brand.config.ts' || file === 'src/editable/theme/visual-system.ts') return false
   if (/brand\.config\.ts$|visual-system\.ts$/.test(file)) return true

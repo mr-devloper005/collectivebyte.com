@@ -1,15 +1,24 @@
-import { EditableTaskDetailRoute, generateEditableDetailMetadata } from '@/editable/pages/TaskDetailPage'
+import { TaskDetailPage } from "@/components/tasks/task-detail-page";
+import { buildPostMetadata, buildTaskMetadata } from "@/lib/seo";
+import { fetchTaskPostBySlug, fetchTaskPosts } from "@/lib/task-data";
 
-export const revalidate = 3
+export const revalidate = 3;
 
 export async function generateStaticParams() {
-  return []
+  const posts = await fetchTaskPosts("article", 50);
+  if (!posts.length) {
+    return [{ slug: "placeholder" }];
+  }
+  return posts.map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  return generateEditableDetailMetadata('article', params)
+  const resolvedParams = await params;
+  const post = await fetchTaskPostBySlug("article", resolvedParams.slug);
+  return post ? await buildPostMetadata("article", post) : await buildTaskMetadata("article");
 }
 
 export default async function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  return <EditableTaskDetailRoute task="article" params={params} />
+  const resolvedParams = await params;
+  return <TaskDetailPage task="article" slug={resolvedParams.slug} />;
 }

@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 const FALLBACK_SITE_CODE = 'mysterycoder';
 const FALLBACK_SITE_URL = 'https://mysterycoder.com';
 const FALLBACK_SITE_NAME = 'Mystery Coder';
-const REQUEST_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_PUBLIC_API_TIMEOUT_MS || 8000);
 
 const trimString = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
 
@@ -40,9 +39,7 @@ export async function POST(request: Request) {
   const name = trimString(payload.name);
   const email = trimString(payload.email).toLowerCase();
   const phone = trimString(payload.phone);
-  const siteName = process.env.NEXT_PUBLIC_SITE_NAME || FALLBACK_SITE_NAME;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || FALLBACK_SITE_URL;
-  const subject = trimString(payload.subject) || `New contact request from ${siteName}`;
+  const subject = trimString(payload.subject) || `New contact request from ${FALLBACK_SITE_NAME}`;
   const message = trimString(payload.message);
 
   if (!name || !email || !message) {
@@ -64,16 +61,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const sourceUrl = request.headers.get('referer') || `${siteUrl}/contact`;
+  const sourceUrl = request.headers.get('referer') || `${FALLBACK_SITE_URL}/contact`;
 
   try {
     const response = await fetch(masterContactUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      signal:
-        typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
-          ? AbortSignal.timeout(Number.isFinite(REQUEST_TIMEOUT_MS) ? REQUEST_TIMEOUT_MS : 8000)
-          : undefined,
       body: JSON.stringify({
         name,
         email,
@@ -81,7 +74,7 @@ export async function POST(request: Request) {
         subject,
         message,
         sourceUrl,
-        meta: { siteName, siteUrl, form: 'contact-page' },
+        meta: { siteName: FALLBACK_SITE_NAME, siteUrl: FALLBACK_SITE_URL, form: 'contact-page' },
       }),
       cache: 'no-store',
     });

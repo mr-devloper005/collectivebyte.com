@@ -10,8 +10,11 @@ export type SiteTaskKey =
   | 'article'
   | 'image'
   | 'profile'
+  | 'social'
   | 'pdf'
+  | 'org'
   | 'sbm'
+  | 'comment'
 
 export type SiteTheme = {
   shell: SiteShell
@@ -38,6 +41,9 @@ export type SiteTheme = {
     classified: TaskCardVariant
     pdf: TaskCardVariant
     sbm: TaskCardVariant
+    social: TaskCardVariant
+    org: TaskCardVariant
+    comment: TaskCardVariant
   }
 }
 
@@ -66,6 +72,9 @@ export const DEFAULT_SITE_THEME: SiteTheme = {
     classified: 'catalog-grid',
     pdf: 'catalog-grid',
     sbm: 'editorial-feature',
+    social: 'studio-panel',
+    org: 'catalog-grid',
+    comment: 'editorial-feature',
   },
 }
 

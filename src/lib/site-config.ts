@@ -7,8 +7,11 @@ export type TaskKey =
   | 'article'
   | 'image'
   | 'profile'
+  | 'social'
   | 'pdf'
+  | 'org'
   | 'sbm'
+  | 'comment'
 
 export type TaskConfig = {
   key: TaskKey
@@ -36,10 +39,6 @@ export type SiteConfig = {
   }
 }
 
-const enabledTaskKeys: Set<TaskKey> = new Set(
-  siteTaskDefinitions.filter((task) => task.enabled).map((task) => task.key as TaskKey)
-)
-
 export const SITE_CONFIG: SiteConfig = {
   name: siteIdentity.name,
   tagline: siteIdentity.tagline,
@@ -48,9 +47,7 @@ export const SITE_CONFIG: SiteConfig = {
   baseUrl: siteIdentity.url,
   defaultOgImage: siteIdentity.ogImage,
   tasks: siteTaskDefinitions.map((task) => ({ ...task })),
-  taskViews: Object.fromEntries(
-    Object.entries(siteTaskViews).filter(([key]) => enabledTaskKeys.has(key as TaskKey))
-  ) as Partial<Record<TaskKey, string>>,
+  taskViews: { ...siteTaskViews },
   seo: {
     title: `${siteIdentity.name} - ${siteIdentity.tagline}`,
     titleTemplate: `%s | ${siteIdentity.name}`,
@@ -72,6 +69,3 @@ export const SITE_CONFIG: SiteConfig = {
 
 export const getTaskConfig = (key: TaskKey) =>
   SITE_CONFIG.tasks.find((task) => task.key === key) || null
-
-export const isTaskEnabled = (key: TaskKey) =>
-  SITE_CONFIG.tasks.some((task) => task.key === key && task.enabled)
