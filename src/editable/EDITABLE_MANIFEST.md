@@ -1,52 +1,53 @@
 # Slot 4 Editable Manifest
 
-This folder is the only safe UI customization surface for Slot 4 sites.
+Slot 4 is now a reference-ready editable UI architecture.
 
-## Allowed To Edit
+## Contract
 
-- `src/editable/pages/**`
-- `src/editable/content/**`
-- `src/editable/theme/**`
-- `src/editable/components/**`
+- `src/app/**` is route wiring only.
+- `src/lib/**`, `src/config/**`, and APIs are data/SEO/routing logic only.
+- All visible UI should live inside `src/editable/**`.
+- Navbar, footer, body shell, page layouts, task archives, task details, cards, sections, theme, and copy are editable.
+- Normal UI PRs must only change `src/editable/**`.
 
-## Do Not Edit
+## Editable Surface
 
-- `src/app/**` except route files intentionally importing editable pages
-- `src/lib/**`
-- `src/config/**`
-- `src/components/**` outside `src/editable/components/**`
-- `src/design/**`
-- `src/app/api/**`
-- `.github/**`
-- `Dockerfile`
-- `docker-compose*.yml`
-- `package.json`
-- lockfiles
+```txt
+src/editable/shell/EditableSiteShell.tsx
+src/editable/shell/EditableNavbar.tsx
+src/editable/shell/EditableFooter.tsx
+src/editable/pages/HomePage.tsx
+src/editable/pages/LoginPage.tsx
+src/editable/pages/SignupPage.tsx
+src/editable/pages/TaskArchivePage.tsx
+src/editable/pages/TaskDetailPage.tsx
+src/editable/pages/*Page.tsx
+src/editable/cards/PostCards.tsx
+src/editable/sections/*.tsx
+src/editable/content/*.ts
+src/editable/theme/*.ts
+src/editable/theme/editable-global.css
+```
 
-## AI Redesign Workflow
+## AI Redesign Rule
 
-Give AI only this folder unless a build error requires more context.
-Ask for complete drop-in files only.
-Keep all exported component names and props compatible.
-Do not remove post loops, links, contact form, metadata exports, or task detail behavior.
+When giving this folder to AI, ask it to rewrite `src/editable/**` only. It may fully redesign body, nav, footer, page layout, cards, task pages, and detail pages. It must preserve exported component/function names and props.
 
-## Recommended AI Upload Set
+## Do Not Touch
 
-For a full redesign:
+```txt
+src/app/**
+src/lib/**
+src/config/**
+src/components/**
+.github/**
+Dockerfile
+package.json
+next.config.*
+```
 
-- `src/editable/pages/**`
-- `src/editable/content/pages.content.ts`
-- `src/editable/content/global.content.ts`
-- `src/editable/theme/brand.config.ts`
-- `src/editable/theme/visual-system.ts`
-- `src/editable/components/LoadingStates.tsx`
-- `src/editable/components/EmptyStates.tsx`
-
-## Required Checks
-
-Run before PR:
+For one-time base infrastructure changes only:
 
 ```bash
-pnpm guard:editable
-pnpm build
+ALLOW_INFRASTRUCTURE_CHANGES=1 pnpm guard:editable
 ```
