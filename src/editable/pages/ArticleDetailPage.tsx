@@ -2,7 +2,8 @@ import { TaskDetailPage } from "@/components/tasks/task-detail-page";
 import { buildPostMetadata, buildTaskMetadata } from "@/lib/seo";
 import { fetchTaskPostBySlug, fetchTaskPosts } from "@/lib/task-data";
 
-export const revalidate = 3;
+export const revalidate = 3
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   const posts = await fetchTaskPosts("article", 50);
